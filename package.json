@@ -1,0 +1,40 @@
+{
+  "name": "syncpen-mcp",
+  "version": "1.1.0",
+  "description": "MCP server for SyncPen - connect Claude Code to your SyncPen documents",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "syncpen-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "syncpen",
+    "claude",
+    "ai"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/airbuzz/syncpen-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/airbuzz/syncpen-mcp/issues"
+  },
+  "homepage": "https://github.com/airbuzz/syncpen-mcp#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
