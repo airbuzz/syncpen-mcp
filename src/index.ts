@@ -18,6 +18,7 @@ import { listFolders, listDocuments } from "./tools/list.js";
 import { searchDocuments } from "./tools/search.js";
 import { readDocument } from "./tools/read.js";
 import { createDocument, updateDocument } from "./tools/write.js";
+import { createFolder, renameFolder } from "./tools/folder.js";
 
 // Tool definitions
 const TOOLS: Tool[] = [
@@ -83,6 +84,38 @@ const TOOLS: Tool[] = [
           description: "Maximum number of documents to return (default 50, max 100)",
         },
       },
+    },
+  },
+  {
+    name: "syncpen_create_folder",
+    description: "Create a new folder in your SyncPen account.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: "Name of the folder to create",
+        },
+      },
+      required: ["name"],
+    },
+  },
+  {
+    name: "syncpen_rename_folder",
+    description: "Rename an existing SyncPen folder.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        folderId: {
+          type: "string",
+          description: "The ID of the folder to rename",
+        },
+        name: {
+          type: "string",
+          description: "New name for the folder",
+        },
+      },
+      required: ["folderId", "name"],
     },
   },
   {
@@ -186,6 +219,21 @@ async function main() {
             client,
             (args as { folderId?: string }).folderId,
             (args as { limit?: number }).limit
+          );
+          break;
+
+        case "syncpen_create_folder":
+          result = await createFolder(
+            client,
+            (args as { name: string }).name
+          );
+          break;
+
+        case "syncpen_rename_folder":
+          result = await renameFolder(
+            client,
+            (args as { folderId: string }).folderId,
+            (args as { name: string }).name
           );
           break;
 

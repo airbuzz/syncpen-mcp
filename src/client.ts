@@ -35,6 +35,24 @@ export interface ApiError {
   message: string;
 }
 
+export interface CreateFolderResponse {
+  folder: {
+    id: string;
+    name: string;
+    order: number;
+    documentCount: number;
+    createdAt: string;
+  };
+}
+
+export interface RenameFolderResponse {
+  folder: {
+    id: string;
+    name: string;
+    updatedAt: string;
+  };
+}
+
 export interface CreateDocumentResponse {
   document: {
     id: string;
@@ -162,6 +180,16 @@ export class SyncPenClient {
 
     const response = await this.mutate<CreateDocumentResponse>("POST", "/documents", body);
     return response.document;
+  }
+
+  async createFolder(name: string): Promise<CreateFolderResponse["folder"]> {
+    const response = await this.mutate<CreateFolderResponse>("POST", "/folders", { name });
+    return response.folder;
+  }
+
+  async renameFolder(folderId: string, name: string): Promise<RenameFolderResponse["folder"]> {
+    const response = await this.mutate<RenameFolderResponse>("PUT", `/folders/${folderId}`, { name });
+    return response.folder;
   }
 
   async updateDocument(
