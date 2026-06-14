@@ -17,8 +17,18 @@ import { SyncPenClient } from "./client.js";
 import { listFolders, listDocuments } from "./tools/list.js";
 import { searchDocuments } from "./tools/search.js";
 import { readDocument } from "./tools/read.js";
-import { createDocument, updateDocument } from "./tools/write.js";
-import { createFolder, renameFolder } from "./tools/folder.js";
+import {
+  createDocument,
+  updateDocument,
+  moveDocument,
+  deleteDocument,
+} from "./tools/write.js";
+import {
+  createFolder,
+  renameFolder,
+  moveFolder,
+  deleteFolder,
+} from "./tools/folder.js";
 
 // Tool definitions
 const TOOLS: Tool[] = [
@@ -96,6 +106,11 @@ const TOOLS: Tool[] = [
           type: "string",
           description: "Name of the folder to create",
         },
+        parentId: {
+          type: "string",
+          description:
+            "Optional: parent folder ID to nest under (up to 5 levels). Omit to create at the root.",
+        },
       },
       required: ["name"],
     },
@@ -116,6 +131,41 @@ const TOOLS: Tool[] = [
         },
       },
       required: ["folderId", "name"],
+    },
+  },
+  {
+    name: "syncpen_move_folder",
+    description:
+      "Move a folder under a new parent folder, or to the root. Rejects circular moves and moves that exceed the nesting depth limit.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        folderId: {
+          type: "string",
+          description: "The ID of the folder to move",
+        },
+        parentId: {
+          type: "string",
+          description:
+            "Target parent folder ID. Omit to move the folder to the root.",
+        },
+      },
+      required: ["folderId"],
+    },
+  },
+  {
+    name: "syncpen_delete_folder",
+    description:
+      "Delete a folder (moved to trash) along with its subfolders and the documents you own within them.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        folderId: {
+          type: "string",
+          description: "The ID of the folder to delete",
+        },
+      },
+      required: ["folderId"],
     },
   },
   {
@@ -161,6 +211,41 @@ const TOOLS: Tool[] = [
       required: ["documentId"],
     },
   },
+  {
+    name: "syncpen_move_document",
+    description:
+      "Move a document into a folder, or to the root (un-foldered).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        documentId: {
+          type: "string",
+          description: "The ID of the document to move",
+        },
+        folderId: {
+          type: "string",
+          description:
+            "Target folder ID. Omit to move the document to the root.",
+        },
+      },
+      required: ["documentId"],
+    },
+  },
+  {
+    name: "syncpen_delete_document",
+    description:
+      "Delete a document (moved to trash). Only the document owner can delete it.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        documentId: {
+          type: "string",
+          description: "The ID of the document to delete",
+        },
+      },
+      required: ["documentId"],
+    },
+  },
 ];
 
 async function main() {
@@ -172,7 +257,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.0.0",
+      version: "1.2.0",
     },
     {
       capabilities: {
@@ -225,7 +310,8 @@ async function main() {
         case "syncpen_create_folder":
           result = await createFolder(
             client,
-            (args as { name: string }).name
+            (args as { name: string }).name,
+            (args as { parentId?: string }).parentId
           );
           break;
 
@@ -234,6 +320,21 @@ async function main() {
             client,
             (args as { folderId: string }).folderId,
             (args as { name: string }).name
+          );
+          break;
+
+        case "syncpen_move_folder":
+          result = await moveFolder(
+            client,
+            (args as { folderId: string }).folderId,
+            (args as { parentId?: string }).parentId
+          );
+          break;
+
+        case "syncpen_delete_folder":
+          result = await deleteFolder(
+            client,
+            (args as { folderId: string }).folderId
           );
           break;
 
@@ -252,6 +353,21 @@ async function main() {
             (args as { documentId: string }).documentId,
             (args as { title?: string }).title,
             (args as { content?: string }).content
+          );
+          break;
+
+        case "syncpen_move_document":
+          result = await moveDocument(
+            client,
+            (args as { documentId: string }).documentId,
+            (args as { folderId?: string }).folderId
+          );
+          break;
+
+        case "syncpen_delete_document":
+          result = await deleteDocument(
+            client,
+            (args as { documentId: string }).documentId
           );
           break;
 

@@ -39,6 +39,7 @@ export interface CreateFolderResponse {
   folder: {
     id: string;
     name: string;
+    parentId?: string | null;
     order: number;
     documentCount: number;
     createdAt: string;
@@ -49,6 +50,7 @@ export interface RenameFolderResponse {
   folder: {
     id: string;
     name: string;
+    parentId?: string | null;
     updatedAt: string;
   };
 }
@@ -141,7 +143,7 @@ export class SyncPenClient {
   }
 
   private async mutate<T>(
-    method: "POST" | "PUT",
+    method: "POST" | "PUT" | "DELETE",
     path: string,
     body?: Record<string, unknown>
   ): Promise<T> {
@@ -182,14 +184,35 @@ export class SyncPenClient {
     return response.document;
   }
 
-  async createFolder(name: string): Promise<CreateFolderResponse["folder"]> {
-    const response = await this.mutate<CreateFolderResponse>("POST", "/folders", { name });
+  async createFolder(
+    name: string,
+    parentId?: string | null
+  ): Promise<CreateFolderResponse["folder"]> {
+    const body: Record<string, unknown> = { name };
+    if (parentId !== undefined) body.parentId = parentId;
+    const response = await this.mutate<CreateFolderResponse>("POST", "/folders", body);
     return response.folder;
   }
 
   async renameFolder(folderId: string, name: string): Promise<RenameFolderResponse["folder"]> {
     const response = await this.mutate<RenameFolderResponse>("PUT", `/folders/${folderId}`, { name });
     return response.folder;
+  }
+
+  async moveFolder(
+    folderId: string,
+    parentId: string | null
+  ): Promise<RenameFolderResponse["folder"]> {
+    const response = await this.mutate<RenameFolderResponse>(
+      "PUT",
+      `/folders/${folderId}`,
+      { parentId }
+    );
+    return response.folder;
+  }
+
+  async deleteFolder(folderId: string): Promise<void> {
+    await this.mutate<{ ok: boolean }>("DELETE", `/folders/${folderId}`);
   }
 
   async updateDocument(
@@ -206,5 +229,21 @@ export class SyncPenClient {
       body
     );
     return response.document;
+  }
+
+  async moveDocument(
+    documentId: string,
+    folderId: string | null
+  ): Promise<UpdateDocumentResponse["document"]> {
+    const response = await this.mutate<UpdateDocumentResponse>(
+      "PUT",
+      `/documents/${documentId}`,
+      { folderId }
+    );
+    return response.document;
+  }
+
+  async deleteDocument(documentId: string): Promise<void> {
+    await this.mutate<{ ok: boolean }>("DELETE", `/documents/${documentId}`);
   }
 }

@@ -50,3 +50,38 @@ export async function updateDocument(
     `**Last updated:** ${document.updatedAt}`,
   ].join("\n");
 }
+
+export async function moveDocument(
+  client: SyncPenClient,
+  documentId: string,
+  folderId?: string
+): Promise<string> {
+  if (!documentId || documentId.trim().length === 0) {
+    return "Error: Document ID is required.";
+  }
+
+  // Omitting folderId moves the document to the root (un-foldered).
+  const document = await client.moveDocument(documentId, folderId ?? null);
+
+  return [
+    "Document moved successfully.",
+    "",
+    `**Document ID:** ${document.id}`,
+    `**Title:** ${document.title}`,
+    `**Folder:** ${folderId || "(root)"}`,
+    `**Last updated:** ${document.updatedAt}`,
+  ].join("\n");
+}
+
+export async function deleteDocument(
+  client: SyncPenClient,
+  documentId: string
+): Promise<string> {
+  if (!documentId || documentId.trim().length === 0) {
+    return "Error: Document ID is required.";
+  }
+
+  await client.deleteDocument(documentId);
+
+  return `Document ${documentId} deleted (moved to trash).`;
+}
