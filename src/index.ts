@@ -30,6 +30,7 @@ import {
   deleteFolder,
 } from "./tools/folder.js";
 import { publishDocument } from "./tools/publish.js";
+import { listConnections } from "./tools/connections.js";
 
 // Tool definitions
 const TOOLS: Tool[] = [
@@ -293,6 +294,15 @@ const TOOLS: Tool[] = [
       required: ["documentId", "target"],
     },
   },
+  {
+    name: "syncpen_list_connections",
+    description:
+      "List your connected CMS targets (WordPress, Ghost, Sanity) and their connectionIds. Use before syncpen_publish to find the connectionId when a target has more than one active connection.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
 ];
 
 async function main() {
@@ -304,7 +314,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.3.0",
+      version: "1.4.0",
     },
     {
       capabilities: {
@@ -431,6 +441,10 @@ async function main() {
               title: (args as { title?: string }).title,
             }
           );
+          break;
+
+        case "syncpen_list_connections":
+          result = await listConnections(client);
           break;
 
         default:

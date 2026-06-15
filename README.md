@@ -76,6 +76,7 @@ Then use this configuration in your `~/.mcp.json`:
 | `syncpen_move_folder` | Move a folder under a new parent, or to the root |
 | `syncpen_delete_folder` | Delete a folder and its contents (moved to trash) |
 | `syncpen_publish` | Publish a document to WordPress, Ghost, or Sanity |
+| `syncpen_list_connections` | List connected CMS targets and their connectionIds |
 
 ## Usage Examples
 

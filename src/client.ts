@@ -82,6 +82,16 @@ export interface PublishResponse {
   url?: string;
 }
 
+export interface ConnectionSummary {
+  target: string;
+  id: string;
+  siteName: string;
+  isActive: boolean;
+  siteUrl?: string;
+  projectId?: string;
+  dataset?: string;
+}
+
 export class SyncPenClient {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -254,6 +264,11 @@ export class SyncPenClient {
 
   async deleteDocument(documentId: string): Promise<void> {
     await this.mutate<{ ok: boolean }>("DELETE", `/documents/${documentId}`);
+  }
+
+  async listConnections(): Promise<ConnectionSummary[]> {
+    const response = await this.fetch<{ connections: ConnectionSummary[] }>("/connections");
+    return response.connections;
   }
 
   async publishDocument(
