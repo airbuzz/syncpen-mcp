@@ -63,21 +63,29 @@ Then use this configuration in your `~/.mcp.json`:
 
 | Tool | Description |
 |------|-------------|
-| `syncpen_search` | Search documents by title |
+| `syncpen_search` | Search documents by title and body content (full text) |
 | `syncpen_read` | Read a document's content as markdown |
 | `syncpen_list_folders` | List all folders |
 | `syncpen_list_documents` | List documents, optionally by folder |
 | `syncpen_create` | Create a new document |
-| `syncpen_update` | Update an existing document |
+| `syncpen_update` | Update a document's title and/or content |
+| `syncpen_move_document` | Move a document into a folder, or to the root |
+| `syncpen_delete_document` | Delete a document (moved to trash) |
+| `syncpen_create_folder` | Create a folder (optionally nested) |
+| `syncpen_rename_folder` | Rename a folder |
+| `syncpen_move_folder` | Move a folder under a new parent, or to the root |
+| `syncpen_delete_folder` | Delete a folder and its contents (moved to trash) |
+| `syncpen_publish` | Publish a document to WordPress, Ghost, or Sanity |
 
 ## Usage Examples
 
 Once configured, ask Claude Code:
 
 - "List my SyncPen folders"
-- "Search for documents about authentication"
+- "Search for documents that mention authentication"
 - "Read my document titled 'API Design Notes'"
 - "What documents do I have in my 'Projects' folder?"
+- "Publish my 'Launch Post' document to Ghost as a draft"
 
 ## Development
 

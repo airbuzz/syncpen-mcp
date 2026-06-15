@@ -1,5 +1,5 @@
 /**
- * Search tool: search documents by title
+ * Search tool: search documents by title and body content
  */
 
 import { SyncPenClient } from "../client.js";
@@ -8,13 +8,14 @@ export async function searchDocuments(
   client: SyncPenClient,
   query: string,
   folderId?: string,
-  limit?: number
+  limit?: number,
+  mode?: string
 ): Promise<string> {
   if (!query || query.trim().length === 0) {
     return "Error: Search query is required.";
   }
 
-  const results = await client.search({ query, folderId, limit });
+  const results = await client.search({ query, folderId, limit, mode });
 
   if (results.length === 0) {
     return `No documents found matching "${query}".`;
