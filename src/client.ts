@@ -74,6 +74,14 @@ export interface UpdateDocumentResponse {
   };
 }
 
+export interface PublishResponse {
+  success: boolean;
+  target: string;
+  status: string;
+  postId: string;
+  url?: string;
+}
+
 export class SyncPenClient {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -133,10 +141,11 @@ export class SyncPenClient {
     return response.document;
   }
 
-  async search(options: { query: string; folderId?: string; limit?: number }): Promise<DocumentSummary[]> {
+  async search(options: { query: string; folderId?: string; limit?: number; mode?: string }): Promise<DocumentSummary[]> {
     const params: Record<string, string> = { query: options.query };
     if (options.folderId) params.folderId = options.folderId;
     if (options.limit) params.limit = String(options.limit);
+    if (options.mode) params.mode = options.mode;
 
     const response = await this.fetch<{ query: string; results: DocumentSummary[] }>("/search", params);
     return response.results;
@@ -245,5 +254,28 @@ export class SyncPenClient {
 
   async deleteDocument(documentId: string): Promise<void> {
     await this.mutate<{ ok: boolean }>("DELETE", `/documents/${documentId}`);
+  }
+
+  async publishDocument(
+    documentId: string,
+    target: string,
+    options?: {
+      connectionId?: string;
+      status?: string;
+      postType?: string;
+      title?: string;
+    }
+  ): Promise<PublishResponse> {
+    const body: Record<string, unknown> = { target };
+    if (options?.connectionId) body.connectionId = options.connectionId;
+    if (options?.status) body.status = options.status;
+    if (options?.postType) body.postType = options.postType;
+    if (options?.title) body.title = options.title;
+
+    return this.mutate<PublishResponse>(
+      "POST",
+      `/documents/${documentId}/publish`,
+      body
+    );
   }
 }

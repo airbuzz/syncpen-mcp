@@ -29,23 +29,30 @@ import {
   moveFolder,
   deleteFolder,
 } from "./tools/folder.js";
+import { publishDocument } from "./tools/publish.js";
 
 // Tool definitions
 const TOOLS: Tool[] = [
   {
     name: "syncpen_search",
     description:
-      "Search SyncPen documents by title. Use this to find documents about a specific topic.",
+      "Search SyncPen documents by title and body content (full text). Use this to find documents about a specific topic.",
     inputSchema: {
       type: "object",
       properties: {
         query: {
           type: "string",
-          description: "Search query to match against document titles",
+          description: "Search query to match against document titles and body content",
         },
         folderId: {
           type: "string",
           description: "Optional: Filter results to a specific folder",
+        },
+        mode: {
+          type: "string",
+          description:
+            "Optional: where to match — 'title', 'content', or 'all' (default 'all').",
+          enum: ["title", "content", "all"],
         },
         limit: {
           type: "number",
@@ -246,6 +253,46 @@ const TOOLS: Tool[] = [
       required: ["documentId"],
     },
   },
+  {
+    name: "syncpen_publish",
+    description:
+      "Publish a SyncPen document to a connected CMS (WordPress, Ghost, or Sanity). Auto-selects the connection when only one is active for the target; otherwise pass connectionId.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        documentId: {
+          type: "string",
+          description: "The ID of the document to publish",
+        },
+        target: {
+          type: "string",
+          description: "Where to publish: 'wordpress', 'ghost', or 'sanity'",
+          enum: ["wordpress", "ghost", "sanity"],
+        },
+        connectionId: {
+          type: "string",
+          description:
+            "Optional: explicit CMS connection ID. Omit to auto-select the single active connection for the target.",
+        },
+        status: {
+          type: "string",
+          description:
+            "Optional: post status. WordPress: 'draft' or 'publish'. Ghost/Sanity: 'draft' or 'published'. Defaults to published.",
+        },
+        postType: {
+          type: "string",
+          description: "Optional: 'post' or 'page' (WordPress and Ghost only).",
+          enum: ["post", "page"],
+        },
+        title: {
+          type: "string",
+          description:
+            "Optional: override the post title (defaults to the document's first heading, then its title).",
+        },
+      },
+      required: ["documentId", "target"],
+    },
+  },
 ];
 
 async function main() {
@@ -257,7 +304,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.2.0",
+      version: "1.3.0",
     },
     {
       capabilities: {
@@ -284,7 +331,8 @@ async function main() {
             client,
             (args as { query: string }).query,
             (args as { folderId?: string }).folderId,
-            (args as { limit?: number }).limit
+            (args as { limit?: number }).limit,
+            (args as { mode?: string }).mode
           );
           break;
 
@@ -368,6 +416,20 @@ async function main() {
           result = await deleteDocument(
             client,
             (args as { documentId: string }).documentId
+          );
+          break;
+
+        case "syncpen_publish":
+          result = await publishDocument(
+            client,
+            (args as { documentId: string }).documentId,
+            (args as { target: string }).target,
+            {
+              connectionId: (args as { connectionId?: string }).connectionId,
+              status: (args as { status?: string }).status,
+              postType: (args as { postType?: string }).postType,
+              title: (args as { title?: string }).title,
+            }
           );
           break;
 
