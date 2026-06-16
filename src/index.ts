@@ -31,6 +31,13 @@ import {
 } from "./tools/folder.js";
 import { publishDocument } from "./tools/publish.js";
 import { listConnections } from "./tools/connections.js";
+import { suggestEdit, listSuggestions } from "./tools/suggestions.js";
+import {
+  listComments,
+  replyComment,
+  resolveComment,
+} from "./tools/comments.js";
+import type { SuggestionAnchor } from "./client.js";
 
 // Tool definitions
 const TOOLS: Tool[] = [
@@ -255,6 +262,117 @@ const TOOLS: Tool[] = [
     },
   },
   {
+    name: "syncpen_suggest_edit",
+    description:
+      "Propose an edit to a document as a pending suggestion that a human accepts or rejects in the editor. The document is NOT changed until accepted. Use this instead of syncpen_update when you want human approval. Anchor the edit either by character offsets {from,to} or by a unique snippet {text} to replace.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        documentId: {
+          type: "string",
+          description: "The ID of the document to suggest an edit on",
+        },
+        anchor: {
+          type: "object",
+          description:
+            "Where to apply the edit. Provide EITHER {from,to} character offsets, OR {text} — a snippet that occurs exactly once in the document and will be replaced.",
+          properties: {
+            from: {
+              type: "number",
+              description: "Start character offset (use together with 'to').",
+            },
+            to: {
+              type: "number",
+              description: "End character offset, exclusive (use together with 'from').",
+            },
+            text: {
+              type: "string",
+              description:
+                "A unique snippet in the document to replace (alternative to from/to).",
+            },
+          },
+        },
+        newText: {
+          type: "string",
+          description: "The replacement text for the anchored range.",
+        },
+        note: {
+          type: "string",
+          description: "Optional rationale shown to the human alongside the suggestion.",
+        },
+      },
+      required: ["documentId", "anchor", "newText"],
+    },
+  },
+  {
+    name: "syncpen_list_suggestions",
+    description:
+      "List a document's suggestions so you can see what is still pending. Defaults to pending only; pass status 'all' to include accepted/rejected.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        documentId: {
+          type: "string",
+          description: "The ID of the document",
+        },
+        status: {
+          type: "string",
+          description: "Optional: 'pending' (default) or 'all'.",
+          enum: ["pending", "all"],
+        },
+      },
+      required: ["documentId"],
+    },
+  },
+  {
+    name: "syncpen_list_comments",
+    description:
+      "Read the comment threads on a document (top-level comments with their replies, line numbers, authors, and resolved state).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        documentId: {
+          type: "string",
+          description: "The ID of the document",
+        },
+      },
+      required: ["documentId"],
+    },
+  },
+  {
+    name: "syncpen_reply_comment",
+    description:
+      "Reply to a comment thread. The reply is posted under the agent's name and notifies any @mentioned members.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        commentId: {
+          type: "string",
+          description: "The ID of the comment to reply to (from syncpen_list_comments).",
+        },
+        body: {
+          type: "string",
+          description: "The reply text. Supports @mentions of document members.",
+        },
+      },
+      required: ["commentId", "body"],
+    },
+  },
+  {
+    name: "syncpen_resolve_comment",
+    description: "Mark a comment thread as resolved after acting on it.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        commentId: {
+          type: "string",
+          description: "The ID of the comment to resolve.",
+        },
+      },
+      required: ["commentId"],
+    },
+  },
+  {
     name: "syncpen_publish",
     description:
       "Publish a SyncPen document to a connected CMS (WordPress, Ghost, or Sanity). Auto-selects the connection when only one is active for the target; otherwise pass connectionId.",
@@ -314,7 +432,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.4.0",
+      version: "1.5.0",
     },
     {
       capabilities: {
@@ -426,6 +544,46 @@ async function main() {
           result = await deleteDocument(
             client,
             (args as { documentId: string }).documentId
+          );
+          break;
+
+        case "syncpen_suggest_edit":
+          result = await suggestEdit(
+            client,
+            (args as { documentId: string }).documentId,
+            (args as { anchor?: SuggestionAnchor }).anchor,
+            (args as { newText?: string }).newText,
+            (args as { note?: string }).note
+          );
+          break;
+
+        case "syncpen_list_suggestions":
+          result = await listSuggestions(
+            client,
+            (args as { documentId: string }).documentId,
+            (args as { status?: string }).status
+          );
+          break;
+
+        case "syncpen_list_comments":
+          result = await listComments(
+            client,
+            (args as { documentId: string }).documentId
+          );
+          break;
+
+        case "syncpen_reply_comment":
+          result = await replyComment(
+            client,
+            (args as { commentId: string }).commentId,
+            (args as { body?: string }).body
+          );
+          break;
+
+        case "syncpen_resolve_comment":
+          result = await resolveComment(
+            client,
+            (args as { commentId: string }).commentId
           );
           break;
 

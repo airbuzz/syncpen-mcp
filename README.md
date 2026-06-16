@@ -69,6 +69,11 @@ Then use this configuration in your `~/.mcp.json`:
 | `syncpen_list_documents` | List documents, optionally by folder |
 | `syncpen_create` | Create a new document |
 | `syncpen_update` | Update a document's title and/or content |
+| `syncpen_suggest_edit` | Propose an edit as a pending suggestion a human accepts/rejects (doc unchanged until accepted) |
+| `syncpen_list_suggestions` | List a document's pending (or all) suggestions |
+| `syncpen_list_comments` | Read comment threads (with replies, line numbers, authors) |
+| `syncpen_reply_comment` | Reply to a comment thread (signed, notifies @mentions) |
+| `syncpen_resolve_comment` | Mark a comment thread resolved |
 | `syncpen_move_document` | Move a document into a folder, or to the root |
 | `syncpen_delete_document` | Delete a document (moved to trash) |
 | `syncpen_create_folder` | Create a folder (optionally nested) |

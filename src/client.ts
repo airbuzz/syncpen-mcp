@@ -92,6 +92,43 @@ export interface ConnectionSummary {
   dataset?: string;
 }
 
+export interface SuggestionAnchor {
+  from?: number;
+  to?: number;
+  text?: string;
+}
+
+export interface SuggestionSummary {
+  id: string;
+  status: string;
+  agentName: string | null;
+  anchorFrom: number;
+  anchorTo: number;
+  originalText: string;
+  newText: string;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface CommentReplySummary {
+  id: string;
+  author: string;
+  isAgent: boolean;
+  content: string;
+  createdAt: string;
+}
+
+export interface CommentThread {
+  id: string;
+  lineNumber: number;
+  author: string;
+  isAgent: boolean;
+  content: string;
+  resolved: boolean;
+  createdAt: string;
+  replies: CommentReplySummary[];
+}
+
 export class SyncPenClient {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -292,5 +329,56 @@ export class SyncPenClient {
       `/documents/${documentId}/publish`,
       body
     );
+  }
+
+  async suggestEdit(
+    documentId: string,
+    anchor: SuggestionAnchor,
+    newText: string,
+    note?: string
+  ): Promise<string> {
+    const body: Record<string, unknown> = { anchor, newText };
+    if (note) body.note = note;
+    const response = await this.mutate<{ suggestionId: string }>(
+      "POST",
+      `/documents/${documentId}/suggestions`,
+      body
+    );
+    return response.suggestionId;
+  }
+
+  async listSuggestions(
+    documentId: string,
+    status?: string
+  ): Promise<SuggestionSummary[]> {
+    const params: Record<string, string> = {};
+    if (status) params.status = status;
+    const response = await this.fetch<{ suggestions: SuggestionSummary[] }>(
+      `/documents/${documentId}/suggestions`,
+      params
+    );
+    return response.suggestions;
+  }
+
+  async listComments(documentId: string): Promise<CommentThread[]> {
+    const response = await this.fetch<{ comments: CommentThread[] }>(
+      `/documents/${documentId}/comments`
+    );
+    return response.comments;
+  }
+
+  async replyComment(
+    commentId: string,
+    body: string
+  ): Promise<{ replyId: string; lineNumber: number }> {
+    return this.mutate<{ replyId: string; lineNumber: number }>(
+      "POST",
+      `/comments/${commentId}/reply`,
+      { body }
+    );
+  }
+
+  async resolveComment(commentId: string): Promise<void> {
+    await this.mutate<{ ok: boolean }>("POST", `/comments/${commentId}/resolve`);
   }
 }
