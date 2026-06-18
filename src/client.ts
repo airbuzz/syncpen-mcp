@@ -21,6 +21,13 @@ export interface DocumentSummary {
   updatedAt: string;
 }
 
+export interface SearchResult extends DocumentSummary {
+  /** Short excerpt around the match (or a leading preview) — triage without a full read. */
+  snippet: string | null;
+  /** Where the query hit: body, title (snippet is a preview), or neither. */
+  matchedIn: "title" | "content" | null;
+}
+
 export interface Document {
   id: string;
   title: string;
@@ -188,13 +195,13 @@ export class SyncPenClient {
     return response.document;
   }
 
-  async search(options: { query: string; folderId?: string; limit?: number; mode?: string }): Promise<DocumentSummary[]> {
+  async search(options: { query: string; folderId?: string; limit?: number; mode?: string }): Promise<SearchResult[]> {
     const params: Record<string, string> = { query: options.query };
     if (options.folderId) params.folderId = options.folderId;
     if (options.limit) params.limit = String(options.limit);
     if (options.mode) params.mode = options.mode;
 
-    const response = await this.fetch<{ query: string; results: DocumentSummary[] }>("/search", params);
+    const response = await this.fetch<{ query: string; results: SearchResult[] }>("/search", params);
     return response.results;
   }
 

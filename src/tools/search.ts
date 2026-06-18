@@ -24,8 +24,11 @@ export async function searchDocuments(
   const lines = results.map((d) => {
     const ownership = d.isOwner ? "owner" : "shared";
     const folder = d.folderId ? ` [folder: ${d.folderId}]` : "";
-    return `- ${d.title} (${ownership})${folder} [id: ${d.id}]`;
+    const head = `- ${d.title} (${ownership})${folder} [id: ${d.id}]`;
+    if (!d.snippet) return head;
+    const where = d.matchedIn === "title" ? "preview" : "match";
+    return `${head}\n    ${where}: ${d.snippet}`;
   });
 
-  return `Found ${results.length} document(s) matching "${query}":\n\n${lines.join("\n")}`;
+  return `Found ${results.length} document(s) matching "${query}". Triage from the snippets below and read only the best match:\n\n${lines.join("\n")}`;
 }

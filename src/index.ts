@@ -10,8 +10,15 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
   type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
+import {
+  SERVER_INSTRUCTIONS,
+  NAVIGATION_SKILL,
+  NAVIGATION_RESOURCE_URI,
+} from "./instructions.js";
 import { getConfig } from "./config.js";
 import { SyncPenClient } from "./client.js";
 import { listFolders, listDocuments } from "./tools/list.js";
@@ -432,12 +439,14 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.5.0",
+      version: "1.6.0",
     },
     {
       capabilities: {
         tools: {},
+        resources: {},
       },
+      instructions: SERVER_INSTRUCTIONS,
     }
   );
 
@@ -445,6 +454,35 @@ async function main() {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: TOOLS,
   }));
+
+  // Expose the long-form navigation guide as a resource (the always-on
+  // `instructions` stays short; agents can pull the full guide on demand).
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: [
+      {
+        uri: NAVIGATION_RESOURCE_URI,
+        name: "SyncPen navigation guide",
+        description:
+          "Token-efficient retrieval discipline and workspace conventions for the SyncPen knowledge base.",
+        mimeType: "text/markdown",
+      },
+    ],
+  }));
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    if (request.params.uri === NAVIGATION_RESOURCE_URI) {
+      return {
+        contents: [
+          {
+            uri: NAVIGATION_RESOURCE_URI,
+            mimeType: "text/markdown",
+            text: NAVIGATION_SKILL,
+          },
+        ],
+      };
+    }
+    throw new Error(`Unknown resource: ${request.params.uri}`);
+  });
 
   // Handle tool calls
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
