@@ -42,6 +42,27 @@ export interface ApiError {
   message: string;
 }
 
+/** Where a user creates an API key — surfaced in auth-failure messages so an
+ *  agent can hand the human the exact next step. */
+const API_KEYS_URL = "https://www.syncpen.io/settings/api-keys";
+
+/**
+ * Turn a failed API response into an agent-actionable Error. A 401 (missing,
+ * invalid, or revoked key) is the launch-critical drop-off point, so it gets a
+ * message that tells the human exactly how to fix it instead of a bare
+ * "unauthorized"; every other status passes the server's own message through.
+ */
+function apiError(status: number, data: ApiError): Error {
+  if (status === 401) {
+    return new Error(
+      "SyncPen authentication failed — your API key is missing, invalid, or revoked. " +
+        `Create or copy a key at ${API_KEYS_URL}, then set it as the SYNCPEN_API_KEY ` +
+        "environment variable in your MCP server config and restart the server."
+    );
+  }
+  return new Error(`SyncPen API error: ${data.message || data.error || "Unknown error"}`);
+}
+
 export interface CreateFolderResponse {
   folder: {
     id: string;
@@ -169,8 +190,7 @@ export class SyncPenClient {
     const data = await response.json();
 
     if (!response.ok) {
-      const error = data as ApiError;
-      throw new Error(`SyncPen API error: ${error.message || error.error || "Unknown error"}`);
+      throw apiError(response.status, data as ApiError);
     }
 
     return data as T;
@@ -226,8 +246,7 @@ export class SyncPenClient {
     const data = await response.json();
 
     if (!response.ok) {
-      const error = data as ApiError;
-      throw new Error(`SyncPen API error: ${error.message || error.error || "Unknown error"}`);
+      throw apiError(response.status, data as ApiError);
     }
 
     return data as T;
