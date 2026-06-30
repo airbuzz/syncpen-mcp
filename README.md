@@ -1,12 +1,14 @@
 # SyncPen MCP Server
 
-Connect Claude Code to your SyncPen documents as a knowledge base.
+Connect Claude Code (or any MCP client) to your [SyncPen](https://www.syncpen.io) workspace — the writing workspace your AI can actually write in. Your agent can search, read, draft, suggest, comment, organize, and publish in the same live documents you edit.
+
+**Don't have an account yet?** Create one free at **[syncpen.io](https://www.syncpen.io)**.
 
 ## Quick Setup
 
 ### 1. Generate an API Key
 
-1. Go to **Settings > API Keys** in your SyncPen account
+1. Go to **[Settings → API Keys](https://www.syncpen.io/settings/api-keys)** in your SyncPen account
 2. Enable API Access
 3. Create a new API key
 4. Copy the key (you'll only see it once!)
