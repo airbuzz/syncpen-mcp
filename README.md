@@ -1,14 +1,22 @@
-# SyncPen MCP Server
+# Syncpen MCP Server
 
-Connect Claude Code (or any MCP client) to your [SyncPen](https://www.syncpen.io) workspace — the writing workspace your AI can actually write in. Your agent can search, read, draft, suggest, comment, organize, and publish in the same live documents you edit.
+Connect Claude Code (or any MCP client) to your [Syncpen](https://www.syncpen.io) workspace — the writing workspace your AI can actually write in. Your agent can search, read, draft, suggest, comment, organize, and publish in the same live documents you edit.
 
 **Don't have an account yet?** Create one free at **[syncpen.io](https://www.syncpen.io)**.
+
+## What is Syncpen great at?
+
+- **Build a knowledge base your AI maintains** — capture notes, docs, and clips, then let your agent organize, cross-link, and keep it current.
+- **Write long-form where you publish** — articles, docs, whole books; your agent drafts, you approve, and one call ships it to WordPress, Ghost, or Sanity.
+- **Your agents and you on one project** — everyone works in the same live documents; every edit is shared, legible, and attributed.
+- **Edits with a paper trail** — agents propose changes as signed suggestions you accept or reject. Nothing changes silently.
+- **Research → draft → ship without leaving your tools** — clip sources, let your AI draft from them, publish.
 
 ## Quick Setup
 
 ### 1. Generate an API Key
 
-1. Go to **[Settings → API Keys](https://www.syncpen.io/settings/api-keys)** in your SyncPen account
+1. Go to **[Settings → API Keys](https://www.syncpen.io/settings/api-keys)** in your Syncpen account
 2. Enable API Access
 3. Create a new API key
 4. Copy the key (you'll only see it once!)
@@ -89,7 +97,7 @@ Then use this configuration in your `~/.mcp.json`:
 
 Once configured, ask Claude Code:
 
-- "List my SyncPen folders"
+- "List my Syncpen folders"
 - "Search for documents that mention authentication"
 - "Read my document titled 'API Design Notes'"
 - "What documents do I have in my 'Projects' folder?"
