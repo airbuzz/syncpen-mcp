@@ -50,34 +50,6 @@ Add to your MCP configuration file (`~/.mcp.json` or project-level `.mcp.json`):
 
 That's it! Claude Code will automatically download and run the MCP server.
 
-## Development Setup
-
-For local development or contributing:
-
-```bash
-git clone https://github.com/airbuzz/syncpen-mcp.git
-cd syncpen-mcp
-npm install
-npm run build
-```
-
-Then use this configuration in your `~/.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "syncpen": {
-      "command": "node",
-      "args": ["/path/to/syncpen-mcp/dist/index.js"],
-      "env": {
-        "SYNCPEN_API_KEY": "sp_your_api_key_here",
-        "SYNCPEN_API_URL": "http://localhost:3000/api/mcp"
-      }
-    }
-  }
-}
-```
-
 ## Available Tools
 
 | Tool | Description |
@@ -114,13 +86,16 @@ Once configured, ask Claude Code:
 
 ## Development
 
-```bash
-# Watch mode for development
-npm run dev
+For contributing or running from source:
 
-# Build for production
-npm run build
+```bash
+git clone https://github.com/airbuzz/syncpen-mcp.git
+cd syncpen-mcp
+npm install
+npm run build     # or: npm run dev  (watch mode)
 ```
+
+Point your MCP config at the built entry (`node /path/to/syncpen-mcp/dist/index.js`). It uses the production API by default; set `SYNCPEN_API_URL` only to target a local instance.
 
 ## License
 
