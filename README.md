@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://www.syncpen.io">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/airbuzz/syncpen-mcp/main/assets/syncpen-logo-dark.png">
+      <img alt="Syncpen" src="https://raw.githubusercontent.com/airbuzz/syncpen-mcp/main/assets/syncpen-logo-light.png" width="200">
+    </picture>
+  </a>
+</p>
+
 # Syncpen MCP Server
 
 Connect Claude Code (or any MCP client) to your [Syncpen](https://www.syncpen.io) workspace — the writing workspace your AI can actually write in. Your agent can search, read, draft, suggest, comment, organize, and publish in the same live documents you edit.
