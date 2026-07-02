@@ -463,7 +463,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.6.2",
+      version: "1.6.3",
     },
     {
       capabilities: {
