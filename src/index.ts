@@ -38,6 +38,7 @@ import {
 } from "./tools/folder.js";
 import { publishDocument } from "./tools/publish.js";
 import { listConnections } from "./tools/connections.js";
+import { recentChanges } from "./tools/recent-changes.js";
 import { suggestEdit, listSuggestions } from "./tools/suggestions.js";
 import {
   listComments,
@@ -428,6 +429,29 @@ const TOOLS: Tool[] = [
       properties: {},
     },
   },
+  {
+    name: "syncpen_recent_changes",
+    description:
+      "A time-ordered feed of recent workspace changes — who created, edited, or trashed which documents, and when. Surfaces both in-app human edits and agent/API writes. Use it to catch up on what changed since you last looked (pass `since`), or to scope to one folder.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        since: {
+          type: "string",
+          description:
+            "Only return changes after this ISO 8601 timestamp (e.g. \"2026-07-01T00:00:00Z\").",
+        },
+        folderId: {
+          type: "string",
+          description: "Limit to changes in documents within this folder.",
+        },
+        limit: {
+          type: "number",
+          description: "Max changes to return (default 50, max 200).",
+        },
+      },
+    },
+  },
 ];
 
 async function main() {
@@ -439,7 +463,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.6.1",
+      version: "1.6.2",
     },
     {
       capabilities: {
@@ -641,6 +665,14 @@ async function main() {
 
         case "syncpen_list_connections":
           result = await listConnections(client);
+          break;
+
+        case "syncpen_recent_changes":
+          result = await recentChanges(client, {
+            since: (args as { since?: string }).since,
+            folderId: (args as { folderId?: string }).folderId,
+            limit: (args as { limit?: number }).limit,
+          });
           break;
 
         default:

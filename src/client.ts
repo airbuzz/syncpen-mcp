@@ -157,6 +157,22 @@ export interface CommentThread {
   replies: CommentReplySummary[];
 }
 
+export interface RecentChange {
+  id: string;
+  documentId: string;
+  documentTitle: string;
+  /** What happened: INSERT (created), EDIT (updated), DELETE (trashed). */
+  type: "INSERT" | "EDIT" | "DELETE";
+  /** Who did it: HUMAN (the account owner in-app) or AGENT (an MCP/API writer). */
+  actor: "HUMAN" | "AGENT";
+  agentName: string | null;
+  description: string;
+  charsBefore: number;
+  charsAfter: number;
+  /** ISO 8601 timestamp. */
+  at: string;
+}
+
 export class SyncPenClient {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -332,6 +348,23 @@ export class SyncPenClient {
   async listConnections(): Promise<ConnectionSummary[]> {
     const response = await this.fetch<{ connections: ConnectionSummary[] }>("/connections");
     return response.connections;
+  }
+
+  async recentChanges(options?: {
+    since?: string;
+    folderId?: string;
+    limit?: number;
+  }): Promise<RecentChange[]> {
+    const params: Record<string, string> = {};
+    if (options?.since) params.since = options.since;
+    if (options?.folderId) params.folderId = options.folderId;
+    if (options?.limit) params.limit = String(options.limit);
+
+    const response = await this.fetch<{ changes: RecentChange[] }>(
+      "/recent-changes",
+      params
+    );
+    return response.changes;
   }
 
   async publishDocument(

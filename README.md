@@ -73,6 +73,7 @@ That's it! Claude Code will automatically download and run the MCP server.
 | `syncpen_delete_folder` | Delete a folder and its contents (moved to trash) |
 | `syncpen_publish` | Publish a document to WordPress, Ghost, or Sanity |
 | `syncpen_list_connections` | List connected CMS targets and their connectionIds |
+| `syncpen_recent_changes` | A time-ordered feed of who created/edited/trashed which documents, and when |
 
 ## Usage Examples
 
@@ -83,6 +84,7 @@ Once configured, ask Claude Code:
 - "Read my document titled 'API Design Notes'"
 - "What documents do I have in my 'Projects' folder?"
 - "Publish my 'Launch Post' document to Ghost as a draft"
+- "What's changed in my workspace since yesterday?"
 
 ## Development
 
