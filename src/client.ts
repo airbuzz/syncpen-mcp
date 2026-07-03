@@ -173,6 +173,21 @@ export interface RecentChange {
   at: string;
 }
 
+export interface RelatedDocument {
+  documentId: string;
+  title: string;
+  /** Blended relevance score (co-access weight + explicit-link bonus). */
+  score: number;
+  /** How many working sessions touched both this doc and the target. */
+  coAccessSessions: number;
+  /** The target document links to this one. */
+  linkedOut: boolean;
+  /** This document links back to the target. */
+  linkedIn: boolean;
+  /** Plain-language explanation of why it's related. */
+  reason: string;
+}
+
 export class SyncPenClient {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -365,6 +380,20 @@ export class SyncPenClient {
       params
     );
     return response.changes;
+  }
+
+  async relatedDocuments(
+    documentId: string,
+    options?: { limit?: number }
+  ): Promise<RelatedDocument[]> {
+    const params: Record<string, string> = { documentId };
+    if (options?.limit) params.limit = String(options.limit);
+
+    const response = await this.fetch<{ related: RelatedDocument[] }>(
+      "/related",
+      params
+    );
+    return response.related;
   }
 
   async publishDocument(

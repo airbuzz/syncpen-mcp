@@ -39,6 +39,7 @@ import {
 import { publishDocument } from "./tools/publish.js";
 import { listConnections } from "./tools/connections.js";
 import { recentChanges } from "./tools/recent-changes.js";
+import { relatedDocuments } from "./tools/related.js";
 import { suggestEdit, listSuggestions } from "./tools/suggestions.js";
 import {
   listComments,
@@ -452,6 +453,25 @@ const TOOLS: Tool[] = [
       },
     },
   },
+  {
+    name: "syncpen_related",
+    description:
+      "Given a document, suggest what else to look at — a learned 'what to read next' signal. Blends co-access (documents you worked on in the same sessions as this one, from the change history) with the explicit /editor links in the markdown (both directions). Returns documents ranked by relevance, each with a plain-language reason. Use it to warm-start on a topic or find the documents that tend to travel together.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        documentId: {
+          type: "string",
+          description: "The ID of the document to find related documents for",
+        },
+        limit: {
+          type: "number",
+          description: "Max related documents to return (default 10, max 50).",
+        },
+      },
+      required: ["documentId"],
+    },
+  },
 ];
 
 async function main() {
@@ -463,7 +483,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.6.3",
+      version: "1.6.4",
     },
     {
       capabilities: {
@@ -673,6 +693,14 @@ async function main() {
             folderId: (args as { folderId?: string }).folderId,
             limit: (args as { limit?: number }).limit,
           });
+          break;
+
+        case "syncpen_related":
+          result = await relatedDocuments(
+            client,
+            (args as { documentId: string }).documentId,
+            (args as { limit?: number }).limit
+          );
           break;
 
         default:

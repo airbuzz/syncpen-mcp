@@ -74,6 +74,7 @@ That's it! Claude Code will automatically download and run the MCP server.
 | `syncpen_publish` | Publish a document to WordPress, Ghost, or Sanity |
 | `syncpen_list_connections` | List connected CMS targets and their connectionIds |
 | `syncpen_recent_changes` | A time-ordered feed of who created/edited/trashed which documents, and when |
+| `syncpen_related` | Given a document, suggest what else to read — blends co-access (docs worked on together) with the /editor links |
 
 ## Usage Examples
 
