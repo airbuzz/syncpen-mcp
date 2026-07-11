@@ -3,7 +3,7 @@
   "name": "io.github.airbuzz/syncpen-mcp",
   "title": "Syncpen",
   "description": "The markdown workspace your AI can read, search, and suggest edits in — every change signed.",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "repository": {
     "url": "https://github.com/airbuzz/syncpen-mcp",
     "source": "github"
@@ -14,7 +14,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "syncpen-mcp",
-      "version": "1.6.4",
+      "version": "1.7.0",
       "transport": {
         "type": "stdio"
       },

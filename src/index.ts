@@ -53,7 +53,7 @@ const TOOLS: Tool[] = [
   {
     name: "syncpen_search",
     description:
-      "Search SyncPen documents by title and body content (full text). Use this to find documents about a specific topic.",
+      "Search SyncPen documents. Modes: 'all' (default), 'title', 'content' are keyword/full-text; 'semantic' finds documents by meaning (embeddings) even when they share no words with the query. Use this to find documents about a specific topic.",
     inputSchema: {
       type: "object",
       properties: {
@@ -68,8 +68,8 @@ const TOOLS: Tool[] = [
         mode: {
           type: "string",
           description:
-            "Optional: where to match — 'title', 'content', or 'all' (default 'all').",
-          enum: ["title", "content", "all"],
+            "Optional: 'title', 'content', or 'all' (default 'all') are keyword/full-text; 'semantic' matches by meaning (embeddings), useful when the query and the document share no exact words.",
+          enum: ["title", "content", "all", "semantic"],
         },
         limit: {
           type: "number",
@@ -483,7 +483,7 @@ async function main() {
   const server = new Server(
     {
       name: "syncpen",
-      version: "1.6.4",
+      version: "1.7.0",
     },
     {
       capabilities: {
